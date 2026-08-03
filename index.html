@@ -37,6 +37,7 @@
   #app {
     display: flex;
     height: 100vh;
+    height: 100dvh;   /* dynamic viewport: excludes mobile URL bar */
     width: 100vw;
   }
 
@@ -215,8 +216,6 @@
     font-size: 18px;
     flex-shrink: 0;
   }
-
-  .nav-arrows { display: flex; gap: 10px; }
 
   .nav-btn {
     width: 36px; height: 36px;
@@ -639,10 +638,11 @@
     #drawer-overlay { display: block; }
     #drawer-overlay.visible { opacity: 1; visibility: visible; pointer-events: all; }
 
-    /* Main takes full height minus bottom bar */
+    /* Main fills the app container (100dvh) minus bottom bar */
     #main {
       flex: 1;
-      height: 100vh;
+      height: auto;
+      min-height: 0;
       padding-bottom: var(--bottom-bar);
     }
 
@@ -680,6 +680,7 @@
     .word-card .word-num { top: 8px; left: 10px; }
 
     #section-nav { margin-top: 0; padding-top: 10px; gap: 10px; }
+    .section-nav-btn { opacity: 0.8; }
     .section-nav-btn { padding: 6px 2px; }
     .snb-title { font-size: 12px; }
 
@@ -788,10 +789,6 @@
   <main id="main">
     <div id="top-bar">
       <button id="menu-btn" aria-label="Open phrase list">&#9776;</button>
-      <div class="nav-arrows">
-        <button class="nav-btn" id="btn-prev" title="Previous">&#8592;</button>
-        <button class="nav-btn" id="btn-next" title="Next">&#8594;</button>
-      </div>
       <div class="progress-track">
         <div class="progress-fill" id="progress-fill"></div>
       </div>
@@ -842,7 +839,7 @@
         <span class="tag">Twelver Shia</span>
         <span class="tag">Arabic</span>
       </div>
-      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.5</span>
+      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.6</span>
     </div>
   </main>
 
@@ -1749,8 +1746,6 @@ function selectPhrase(idx) {
   document.getElementById('progress-label-m').textContent = `${idx + 1} / ${allItems.length}`;
 
   // Nav buttons — desktop
-  document.getElementById('btn-prev').disabled = idx === 0;
-  document.getElementById('btn-next').disabled = idx === allItems.length - 1;
   document.getElementById('btn-prev-side').disabled = idx === 0;
   document.getElementById('btn-next-side').disabled = idx === allItems.length - 1;
   // Nav buttons — mobile
@@ -1776,8 +1771,6 @@ function closeDrawer() {
 
 // ── Event wiring ──────────────────────────────
 // Desktop nav
-document.getElementById('btn-prev').addEventListener('click', () => goPrev());
-document.getElementById('btn-next').addEventListener('click', () => goNext());
 document.getElementById('btn-prev-side').addEventListener('click', () => goPrev());
 document.getElementById('btn-next-side').addEventListener('click', () => goNext());
 
