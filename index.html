@@ -266,6 +266,8 @@
     scrollbar-width: thin;
     scrollbar-color: var(--navy3) transparent;
     -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
   }
 
   #content::-webkit-scrollbar { width: 5px; }
@@ -404,6 +406,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 12px;
+    margin-bottom: 28px;
     animation: fadeUp 0.5s ease 0.1s both;
   }
 
@@ -465,13 +468,13 @@
     letter-spacing: 1px;
   }
 
-  /* ── Section navigation — intentionally subtle ── */
+  /* ── Section navigation — intentionally subtle, pinned to bottom ── */
   #section-nav {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 32px;
-    padding-top: 14px;
+    margin-top: auto;
+    padding-top: 24px;
     border-top: 1px solid rgba(200,152,58,0.08);
   }
 
@@ -659,7 +662,7 @@
     .word-card .arabic { font-size: 20px; }
     .word-card .word-num { top: 8px; left: 10px; }
 
-    #section-nav { margin-top: 24px; padding-top: 12px; gap: 10px; }
+    #section-nav { margin-top: auto; padding-top: 16px; gap: 10px; }
     .section-nav-btn { padding: 6px 2px; }
     .snb-title { font-size: 12px; }
 
@@ -822,7 +825,7 @@
         <span class="tag">Twelver Shia</span>
         <span class="tag">Arabic</span>
       </div>
-      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.2</span>
+      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.3</span>
     </div>
   </main>
 
