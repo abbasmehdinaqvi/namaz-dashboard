@@ -536,6 +536,34 @@
 
   .section-nav-btn:hover .snb-title { color: var(--gold2); }
 
+  /* Current section — decorative centerpiece, not clickable */
+  #current-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  .cs-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(200,152,58,0.45);
+  }
+
+  .cs-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--gold2);
+    white-space: nowrap;
+  }
+
   /* ── Slide arrows in the Word Breakdown divider — primary navigation ── */
   .side-arrow {
     flex-shrink: 0;
@@ -681,6 +709,8 @@
 
     #section-nav { margin-top: 0; padding-top: 10px; gap: 10px; }
     .section-nav-btn { opacity: 0.8; }
+    .cs-name { font-size: 13px; }
+    .cs-label { font-size: 8px; }
     .section-nav-btn { padding: 6px 2px; }
     .snb-title { font-size: 12px; }
 
@@ -705,7 +735,7 @@
 
     .tag-group { display: none; }
 
-    .footer-note { white-space: normal; }
+    .footer-note { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Bottom nav bar */
     #bottom-bar {
@@ -826,6 +856,10 @@
           <span class="snb-dir">&#8592; Last Section</span>
           <span class="snb-title" id="last-section-title"></span>
         </button>
+        <div id="current-section">
+          <span class="cs-label">Section</span>
+          <span class="cs-name" id="current-section-name"></span>
+        </div>
         <button class="section-nav-btn" id="btn-next-section">
           <span class="snb-dir">Next Section &#8594;</span>
           <span class="snb-title" id="next-section-title"></span>
@@ -839,7 +873,7 @@
         <span class="tag">Twelver Shia</span>
         <span class="tag">Arabic</span>
       </div>
-      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.6</span>
+      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.7</span>
     </div>
   </main>
 
@@ -865,7 +899,7 @@ const phrases = [
     arabic: "أَعُوذُ بِاللّٰهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
     translit: "A'udhu billahi minash shaitanir rajim",
     english: "I seek refuge in Allah from the accursed Satan.",
-    note: "Recited as a protective opening before the Azan.",
+    note: "Protective opening before the Azan.",
     words: [
       { ar: "أَعُوذُ", tr: "A'udhu", en: "I seek refuge" },
       { ar: "بِاللّٰهِ", tr: "billahi", en: "in Allah" },
@@ -878,7 +912,7 @@ const phrases = [
     arabic: "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ",
     translit: "Bismillahir Rahmanir Rahim",
     english: "In the name of Allah, the Most Compassionate, the Most Merciful.",
-    note: "The Basmala — opens every act begun in God's name.",
+    note: "The Basmala — opening in God's name.",
     words: [
       { ar: "بِسْمِ", tr: "Bismi", en: "In the name" },
       { ar: "اللّٰهِ", tr: "Allah", en: "Allah" },
@@ -890,7 +924,7 @@ const phrases = [
     arabic: "اللّٰهُ أَكْبَرُ",
     translit: "Allahu Akbar",
     english: "Allah is the Greatest.",
-    note: "Takbir — repeated four times at the opening of the Azan.",
+    note: "Takbir — repeated 4× to open the Azan.",
     words: [
       { ar: "اللّٰهُ", tr: "Allahu", en: "Allah" },
       { ar: "أَكْبَرُ", tr: "Akbar", en: "Greatest" },
@@ -900,7 +934,7 @@ const phrases = [
     arabic: "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ",
     translit: "Ashhadu an la ilaha illallah",
     english: "I bear witness that there is no deity except Allah.",
-    note: "First Shahada — declaration of divine oneness (Tawhid).",
+    note: "First Shahada — divine oneness (Tawhid).",
     words: [
       { ar: "أَشْهَدُ", tr: "Ashhadu", en: "I bear witness" },
       { ar: "أَنْ", tr: "an", en: "that" },
@@ -914,7 +948,7 @@ const phrases = [
     arabic: "أَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللّٰهِ",
     translit: "Ashhadu anna Muhammadan Rasulullah",
     english: "I bear witness that Muhammad is the Messenger of Allah.",
-    note: "Second Shahada — declaration of prophethood.",
+    note: "Second Shahada — prophethood.",
     words: [
       { ar: "أَشْهَدُ", tr: "Ashhadu", en: "I bear witness" },
       { ar: "أَنَّ", tr: "anna", en: "that" },
@@ -927,7 +961,7 @@ const phrases = [
     arabic: "صَلَّى اللّٰهُ عَلَيْهِ وَآلِهِ وَسَلَّمَ",
     translit: "Sallallahu alayhi wa alihi wa sallam",
     english: "May Allah send blessings and peace upon him and his family.",
-    note: "Salawat — blessings upon the Prophet and his family (Ahl al-Bayt).",
+    note: "Salawat on the Prophet & his family.",
     words: [
       { ar: "صَلَّى", tr: "Salla", en: "Sent blessings" },
       { ar: "اللّٰهُ", tr: "Allah", en: "Allah" },
@@ -941,7 +975,7 @@ const phrases = [
     arabic: "أَشْهَدُ أَنَّ أَمِيرَ الْمُؤْمِنِينَ وَإِمَامَ الْمُتَّقِينَ",
     translit: "Ashhadu anna Amir al-Mu'minin wa Imam al-Muttaqin",
     english: "I bear witness that the Commander of the Faithful and the Leader of the God-conscious…",
-    note: "Distinctive Shia addition — third Shahada attesting to Imam Ali's authority.",
+    note: "Third Shahada — Imam Ali's authority.",
     words: [
       { ar: "أَشْهَدُ", tr: "Ashhadu", en: "I bear witness" },
       { ar: "أَنَّ", tr: "anna", en: "that" },
@@ -956,7 +990,7 @@ const phrases = [
     arabic: "عَلِيٌّ وَلِيُّ اللّٰهِ وَوَصِيُّ رَسُولِ اللّٰهِ وَخَلِيفَتُهُ",
     translit: "Aliyyun Waliyyullah wa Wasiyyu Rasulillah wa Khalifatuhu",
     english: "Ali is the Friend of Allah, the successor of the Messenger of Allah and his caliph.",
-    note: "Continuation of the third Shahada — affirms Ali's guardianship and succession.",
+    note: "Ali's guardianship & succession.",
     words: [
       { ar: "عَلِيٌّ", tr: "Aliyyun", en: "Ali" },
       { ar: "وَلِيُّ", tr: "Waliyyu", en: "Friend / Guardian" },
@@ -973,7 +1007,7 @@ const phrases = [
     arabic: "اللّٰهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ",
     translit: "Allahumma salli ala Muhammadin wa ali Muhammad",
     english: "O Allah, send blessings upon Muhammad and the family of Muhammad.",
-    note: "Salawat Ibrahim — among the most beloved supplications in Islamic tradition.",
+    note: "Salawat — a most beloved supplication.",
     words: [
       { ar: "اللّٰهُمَّ", tr: "Allahumma", en: "O Allah" },
       { ar: "صَلِّ", tr: "Salli", en: "Send blessings" },
@@ -988,7 +1022,7 @@ const phrases = [
     arabic: "حَيَّ عَلَى الصَّلَاةِ",
     translit: "Hayya alas Salah",
     english: "Come to prayer.",
-    note: "First Hayya — the call to draw near for worship.",
+    note: "First Hayya — come to worship.",
     words: [
       { ar: "حَيَّ", tr: "Hayya", en: "Come / Hasten" },
       { ar: "عَلَى", tr: "ala", en: "to" },
@@ -999,7 +1033,7 @@ const phrases = [
     arabic: "حَيَّ عَلَى الْفَلَاحِ",
     translit: "Hayya alal Falah",
     english: "Come to success.",
-    note: "Second Hayya — falah means flourishing in both this life and the next.",
+    note: "Second Hayya — falah: flourishing.",
     words: [
       { ar: "حَيَّ", tr: "Hayya", en: "Come / Hasten" },
       { ar: "عَلَى", tr: "ala", en: "to" },
@@ -1010,7 +1044,7 @@ const phrases = [
     arabic: "حَيَّ عَلَى خَيْرِ الْعَمَلِ",
     translit: "Hayya ala Khayril Amal",
     english: "Come to the best of deeds.",
-    note: "Third Hayya — distinctive Shia phrase; prayer as the finest act.",
+    note: "Third Hayya — prayer, the finest act.",
     words: [
       { ar: "حَيَّ", tr: "Hayya", en: "Come / Hasten" },
       { ar: "عَلَى", tr: "ala", en: "to" },
@@ -1022,7 +1056,7 @@ const phrases = [
     arabic: "قَدْ قَامَتِ الصَّلَاةُ",
     translit: "Qad qamatis Salah",
     english: "The prayer has been established.",
-    note: "Iqamah-only phrase — signals the congregation to stand and align.",
+    note: "Iqamah only — stand and align.",
     words: [
       { ar: "قَدْ", tr: "Qad", en: "Indeed / Verily" },
       { ar: "قَامَتِ", tr: "Qamat", en: "has been established" },
@@ -1033,7 +1067,7 @@ const phrases = [
     arabic: "لَا إِلٰهَ إِلَّا اللّٰهُ",
     translit: "La ilaha illallah",
     english: "There is no deity except Allah.",
-    note: "The closing declaration — Tawhid distilled to its purest form.",
+    note: "Closing declaration — pure Tawhid.",
     words: [
       { ar: "لَا", tr: "La", en: "No" },
       { ar: "إِلٰهَ", tr: "Ilaha", en: "deity" },
@@ -1048,7 +1082,7 @@ const duaPhrases = [
     arabic: "اللَّهُمَّ اجْعَلْ قَلْبِي بَارًّا",
     translit: "Allahumma aj'al qalbi barran",
     english: "O Allah, make my heart righteous.",
-    note: "Opening of the dua — asking for an upright, God-conscious heart.",
+    note: "Asking for an upright heart.",
     words: [
       { ar: "اللَّهُمَّ", tr: "Allahumma", en: "O Allah" },
       { ar: "اجْعَلْ", tr: "aj'al", en: "make" },
@@ -1060,7 +1094,7 @@ const duaPhrases = [
     arabic: "وَعَيْشِي قَارًّا",
     translit: "Wa 'ayshi qarran",
     english: "And my life peaceful and settled.",
-    note: "Asking for inner and outer tranquility in daily living.",
+    note: "Asking for a tranquil, settled life.",
     words: [
       { ar: "وَ", tr: "wa", en: "and" },
       { ar: "عَيْشِي", tr: "'ayshi", en: "my life" },
@@ -1071,7 +1105,7 @@ const duaPhrases = [
     arabic: "وَرِزْقِي دَارًّا",
     translit: "Wa rizqi darran",
     english: "And my provision abundant and flowing.",
-    note: "Darran (دَارًّا) — provision that pours forth without interruption.",
+    note: "Darran — provision that keeps flowing.",
     words: [
       { ar: "وَ", tr: "wa", en: "and" },
       { ar: "رِزْقِي", tr: "rizqi", en: "my provision / sustenance" },
@@ -1082,7 +1116,7 @@ const duaPhrases = [
     arabic: "وَاجْعَلْ لِي عِنْدَ قَبْرِ نَبِيِّكَ مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ وَسَلَّمَ",
     translit: "Waj'al li 'inda qabri Nabiyyika Muhammadin sallallahu 'alayhi wa alihi wa sallam",
     english: "And grant me, near the grave of Your Prophet Muhammad, may Allah bless him and his family and grant him peace,",
-    note: "The longing phrase — seeking spiritual nearness to the Prophet ﷺ.",
+    note: "Seeking nearness to the Prophet ﷺ.",
     words: [
       { ar: "وَاجْعَلْ", tr: "waj'al", en: "and grant / make" },
       { ar: "لِي", tr: "li", en: "for me" },
@@ -1098,7 +1132,7 @@ const duaPhrases = [
     arabic: "مُسْتَقَرًّا وَقَرَارًا",
     translit: "Mustaqarran wa qararan",
     english: "A resting place and a lasting abode.",
-    note: "Mustaqarr — a settled station; qarar — permanence. Together they ask for spiritual shelter.",
+    note: "Mustaqarr & qarar — spiritual shelter.",
     words: [
       { ar: "مُسْتَقَرًّا", tr: "mustaqarran", en: "a resting place / station" },
       { ar: "وَ", tr: "wa", en: "and" },
@@ -1109,7 +1143,7 @@ const duaPhrases = [
     arabic: "بِرَحْمَتِكَ يَا أَرْحَمَ الرَّاحِمِينَ",
     translit: "Bi rahmatika ya Arhama ar-Rahimin",
     english: "By Your mercy, O Most Merciful of the merciful.",
-    note: "The closing seal — invoking God's infinite mercy as the means of this request.",
+    note: "Closing seal — by His infinite mercy.",
     words: [
       { ar: "بِرَحْمَتِكَ", tr: "bi rahmatika", en: "by Your mercy" },
       { ar: "يَا", tr: "ya", en: "O" },
@@ -1121,7 +1155,7 @@ const duaPhrases = [
     arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
     translit: "Rabbana atina fid dunya hasanatan wa fil akhirati hasanatan wa qina 'adhaban nar",
     english: "Our Lord, grant us good in this world and good in the Hereafter, and protect us from the punishment of the Fire.",
-    note: "Quran 2:201 — the most comprehensive dua; commonly recited in Qunoot during namaz.",
+    note: "Quran 2:201 — the common Qunoot dua.",
     words: [
       { ar: "رَبَّنَا", tr: "Rabbana", en: "Our Lord" },
       { ar: "آتِنَا", tr: "atina", en: "grant us / give us" },
@@ -1142,7 +1176,7 @@ const hamdPhrases = [
     arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
     translit: "Bismillahir Rahmanir Rahim",
     english: "In the name of Allah, the Most Compassionate, the Most Merciful.",
-    note: "Verse 1 — the Basmala; in the Shia reading it is counted as the first verse of the Surah.",
+    note: "Verse 1 — the Basmala counts as verse 1.",
     words: [
       { ar: "بِسْمِ", tr: "Bismi", en: "In the name" },
       { ar: "اللَّهِ", tr: "Allah", en: "Allah" },
@@ -1154,7 +1188,7 @@ const hamdPhrases = [
     arabic: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
     translit: "Alhamdu lillahi Rabbil 'alamin",
     english: "All praise belongs to Allah, Lord of all the worlds.",
-    note: "Verse 2 — the verse the Surah is named after: al-Hamd, the praise.",
+    note: "Verse 2 — al-Hamd, the praise.",
     words: [
       { ar: "الْحَمْدُ", tr: "al-hamdu", en: "all praise" },
       { ar: "لِلَّهِ", tr: "lillahi", en: "belongs to Allah" },
@@ -1166,7 +1200,7 @@ const hamdPhrases = [
     arabic: "الرَّحْمَٰنِ الرَّحِيمِ",
     translit: "Ar-Rahmanir Rahim",
     english: "The Most Compassionate, the Most Merciful.",
-    note: "Verse 3 — mercy repeated, framing how the Lord of the worlds relates to creation.",
+    note: "Verse 3 — mercy, repeated.",
     words: [
       { ar: "الرَّحْمَٰنِ", tr: "ar-Rahman", en: "the Most Compassionate" },
       { ar: "الرَّحِيمِ", tr: "ar-Rahim", en: "the Most Merciful" },
@@ -1176,7 +1210,7 @@ const hamdPhrases = [
     arabic: "مَالِكِ يَوْمِ الدِّينِ",
     translit: "Maliki yawmid din",
     english: "Master of the Day of Judgment.",
-    note: "Verse 4 — sovereignty over the day when all accounts are settled.",
+    note: "Verse 4 — Master of Judgment Day.",
     words: [
       { ar: "مَالِكِ", tr: "Maliki", en: "Master / Owner" },
       { ar: "يَوْمِ", tr: "yawmi", en: "of the Day" },
@@ -1187,7 +1221,7 @@ const hamdPhrases = [
     arabic: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
     translit: "Iyyaka na'budu wa iyyaka nasta'in",
     english: "You alone we worship, and You alone we ask for help.",
-    note: "Verse 5 — the pivot of the Surah: from praising God to addressing Him directly.",
+    note: "Verse 5 — the pivot: addressing Him.",
     words: [
       { ar: "إِيَّاكَ", tr: "iyyaka", en: "You alone" },
       { ar: "نَعْبُدُ", tr: "na'budu", en: "we worship" },
@@ -1199,7 +1233,7 @@ const hamdPhrases = [
     arabic: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
     translit: "Ihdinas siratal mustaqim",
     english: "Guide us on the straight path.",
-    note: "Verse 6 — the central request of the entire Surah: guidance.",
+    note: "Verse 6 — the central request: guidance.",
     words: [
       { ar: "اهْدِنَا", tr: "ihdina", en: "guide us" },
       { ar: "الصِّرَاطَ", tr: "as-sirata", en: "the path" },
@@ -1210,7 +1244,7 @@ const hamdPhrases = [
     arabic: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
     translit: "Siratal ladhina an'amta 'alayhim ghayril maghdubi 'alayhim wa lad dallin",
     english: "The path of those You have blessed — not of those who earned Your anger, nor of those who went astray.",
-    note: "Verse 7 — the straight path defined by those who walked it before.",
+    note: "Verse 7 — the path of the blessed.",
     words: [
       { ar: "صِرَاطَ", tr: "sirata", en: "the path" },
       { ar: "الَّذِينَ", tr: "alladhina", en: "of those who" },
@@ -1230,7 +1264,7 @@ const ikhlasPhrases = [
     arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
     translit: "Bismillahir Rahmanir Rahim",
     english: "In the name of Allah, the Most Compassionate, the Most Merciful.",
-    note: "The Basmala — opening of Surah Al-Ikhlas.",
+    note: "The Basmala — opening of the Surah.",
     words: [
       { ar: "بِسْمِ", tr: "Bismi", en: "In the name" },
       { ar: "اللَّهِ", tr: "Allah", en: "Allah" },
@@ -1242,7 +1276,7 @@ const ikhlasPhrases = [
     arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ",
     translit: "Qul huwallahu ahad",
     english: "Say: He is Allah, the One.",
-    note: "Verse 1 — absolute oneness; the Surah is called 'al-Ikhlas', pure sincerity of belief.",
+    note: "Verse 1 — absolute oneness.",
     words: [
       { ar: "قُلْ", tr: "qul", en: "say" },
       { ar: "هُوَ", tr: "huwa", en: "He is" },
@@ -1254,7 +1288,7 @@ const ikhlasPhrases = [
     arabic: "اللَّهُ الصَّمَدُ",
     translit: "Allahus samad",
     english: "Allah, the Eternal, the Absolute.",
-    note: "Verse 2 — as-Samad: the self-sufficient one whom all depend upon.",
+    note: "Verse 2 — as-Samad, self-sufficient.",
     words: [
       { ar: "اللَّهُ", tr: "Allahu", en: "Allah" },
       { ar: "الصَّمَدُ", tr: "as-samad", en: "the Eternal / Self-Sufficient" },
@@ -1264,7 +1298,7 @@ const ikhlasPhrases = [
     arabic: "لَمْ يَلِدْ وَلَمْ يُولَدْ",
     translit: "Lam yalid wa lam yulad",
     english: "He neither begets nor is born.",
-    note: "Verse 3 — negation of lineage; God is beyond parenthood and origin.",
+    note: "Verse 3 — beyond parenthood & origin.",
     words: [
       { ar: "لَمْ", tr: "lam", en: "not" },
       { ar: "يَلِدْ", tr: "yalid", en: "He begets" },
@@ -1276,7 +1310,7 @@ const ikhlasPhrases = [
     arabic: "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
     translit: "Wa lam yakul lahu kufuwan ahad",
     english: "And there is none comparable to Him.",
-    note: "Verse 4 — the seal of Tawhid: nothing in existence resembles Him.",
+    note: "Verse 4 — nothing resembles Him.",
     words: [
       { ar: "وَلَمْ", tr: "wa lam", en: "and not" },
       { ar: "يَكُن", tr: "yakun", en: "there is" },
@@ -1292,7 +1326,7 @@ const tasbihPhrases = [
     arabic: "سُبْحَانَ اللَّهِ",
     translit: "Subhanallah",
     english: "Glory be to Allah.",
-    note: "First tasbih — declaring Allah free of every imperfection.",
+    note: "First tasbih — glorification.",
     words: [
       { ar: "سُبْحَانَ", tr: "subhana", en: "glory be / exalted is" },
       { ar: "اللَّهِ", tr: "Allah", en: "Allah" },
@@ -1302,7 +1336,7 @@ const tasbihPhrases = [
     arabic: "وَالْحَمْدُ لِلَّهِ",
     translit: "Wal hamdu lillah",
     english: "And all praise belongs to Allah.",
-    note: "Second tasbih — gratitude and praise for every blessing.",
+    note: "Second tasbih — praise.",
     words: [
       { ar: "وَ", tr: "wa", en: "and" },
       { ar: "الْحَمْدُ", tr: "al-hamdu", en: "all praise" },
@@ -1313,7 +1347,7 @@ const tasbihPhrases = [
     arabic: "وَلَا إِلَٰهَ إِلَّا اللَّهُ",
     translit: "Wa la ilaha illallah",
     english: "And there is no deity except Allah.",
-    note: "Third tasbih — the declaration of oneness at the center of the four.",
+    note: "Third tasbih — oneness.",
     words: [
       { ar: "وَلَا", tr: "wa la", en: "and no" },
       { ar: "إِلَٰهَ", tr: "ilaha", en: "deity" },
@@ -1325,7 +1359,7 @@ const tasbihPhrases = [
     arabic: "وَاللَّهُ أَكْبَرُ",
     translit: "Wallahu akbar",
     english: "And Allah is the Greatest.",
-    note: "Fourth tasbih — recited together in the 3rd and 4th rak'ah of namaz in place of Surah Al-Hamd.",
+    note: "Fourth tasbih — for 3rd & 4th rak'ah.",
     words: [
       { ar: "وَ", tr: "wa", en: "and" },
       { ar: "اللَّهُ", tr: "Allahu", en: "Allah" },
@@ -1339,7 +1373,7 @@ const ibrahimPhrases = [
     arabic: "رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِن ذُرِّيَّتِي",
     translit: "Rabbij 'alni muqimas salati wa min dhurriyyati",
     english: "My Lord, make me an establisher of prayer, and from my descendants too.",
-    note: "Ibrahim 14:40 — Prophet Ibrahim's dua for himself and his offspring to uphold salah.",
+    note: "14:40 — to uphold salah, with offspring.",
     words: [
       { ar: "رَبِّ", tr: "Rabbi", en: "my Lord" },
       { ar: "اجْعَلْنِي", tr: "aj'alni", en: "make me" },
@@ -1353,7 +1387,7 @@ const ibrahimPhrases = [
     arabic: "رَبَّنَا وَتَقَبَّلْ دُعَاءِ",
     translit: "Rabbana wa taqabbal du'a",
     english: "Our Lord, and accept my supplication.",
-    note: "Ibrahim 14:40 (continuation) — asking that the dua itself be accepted.",
+    note: "14:40 — accept my supplication.",
     words: [
       { ar: "رَبَّنَا", tr: "Rabbana", en: "our Lord" },
       { ar: "وَتَقَبَّلْ", tr: "wa taqabbal", en: "and accept" },
@@ -1364,7 +1398,7 @@ const ibrahimPhrases = [
     arabic: "رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
     translit: "Rabbanagh fir li wa li walidayya wa lil mu'minina yawma yaqumul hisab",
     english: "Our Lord, forgive me, my parents, and the believers on the Day the account is established.",
-    note: "Ibrahim 14:41 — forgiveness for oneself, one's parents, and all believers.",
+    note: "14:41 — forgiveness for all believers.",
     words: [
       { ar: "رَبَّنَا", tr: "Rabbana", en: "our Lord" },
       { ar: "اغْفِرْ", tr: "ighfir", en: "forgive" },
@@ -1383,7 +1417,7 @@ const israPhrases = [
     arabic: "رَّبِّ أَدْخِلْنِي مُدْخَلَ صِدْقٍ وَأَخْرِجْنِي مُخْرَجَ صِدْقٍ",
     translit: "Rabbi adkhilni mudkhala sidqin wa akhrijni mukhraja sidqin",
     english: "My Lord, cause me to enter a sound entrance and to exit a sound exit.",
-    note: "Isra 17:80 — truthfulness in every beginning and every ending.",
+    note: "17:80 — sound entrances and exits.",
     words: [
       { ar: "رَّبِّ", tr: "Rabbi", en: "my Lord" },
       { ar: "أَدْخِلْنِي", tr: "adkhilni", en: "cause me to enter" },
@@ -1398,7 +1432,7 @@ const israPhrases = [
     arabic: "وَاجْعَل لِّي مِن لَّدُنكَ سُلْطَانًا نَّصِيرًا",
     translit: "Waj'al li mil ladunka sultanan nasira",
     english: "And grant me from Yourself a supporting authority.",
-    note: "Isra 17:80 (continuation) — strength and support that comes from God alone.",
+    note: "17:80 — supporting authority from Him.",
     words: [
       { ar: "وَاجْعَل", tr: "waj'al", en: "and grant / make" },
       { ar: "لِّي", tr: "li", en: "for me" },
@@ -1426,7 +1460,7 @@ const namazPhrases = [
     arabic: "سَمِعَ اللّٰهُ لِمَنْ حَمِدَهُ",
     translit: "Sami' Allahu liman hamidah",
     english: "Allah hears the one who praises Him.",
-    note: "Recited while standing upright after rising from ruku.",
+    note: "Standing upright after ruku.",
     words: [
       { ar: "سَمِعَ", tr: "sami'a", en: "hears" },
       { ar: "اللّٰهُ", tr: "Allahu", en: "Allah" },
@@ -1438,7 +1472,7 @@ const namazPhrases = [
     arabic: "سُبْحَانَ رَبِّيَ الْأَعْلَى وَبِحَمْدِهِ",
     translit: "Subhana Rabbiyal A'la wa bihamdih",
     english: "Glory be to my Lord, the Most High, and all praise belongs to Him.",
-    note: "Sajdah — the dhikr of prostration, recited in both the first and second sajdah.",
+    note: "Sajdah dhikr — both prostrations.",
     words: [
       { ar: "سُبْحَانَ", tr: "subhana", en: "glory be to" },
       { ar: "رَبِّيَ", tr: "Rabbiya", en: "my Lord" },
@@ -1450,7 +1484,7 @@ const namazPhrases = [
     arabic: "أَسْتَغْفِرُ اللّٰهَ رَبِّي وَأَتُوبُ إِلَيْهِ",
     translit: "Astaghfirullaha Rabbi wa atubu ilayh",
     english: "I seek forgiveness from Allah, my Lord, and I repent to Him.",
-    note: "Recited while sitting between the two sajdahs.",
+    note: "Sitting between the two sajdahs.",
     words: [
       { ar: "أَسْتَغْفِرُ", tr: "astaghfiru", en: "I seek forgiveness" },
       { ar: "اللّٰهَ", tr: "Allah", en: "Allah" },
@@ -1463,7 +1497,7 @@ const namazPhrases = [
     arabic: "رَبِّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ وَعَجِّلْ فَرَجَهُمْ",
     translit: "Rabbi salli 'ala Muhammadin wa ali Muhammad wa 'ajjil farajahum",
     english: "My Lord, send blessings upon Muhammad and the family of Muhammad, and hasten their relief.",
-    note: "Recommended dhikr (not obligatory) — commonly recited while seated after sajdah in Twelver practice.",
+    note: "Recommended dhikr — seated after sajdah.",
     words: [
       { ar: "رَبِّ", tr: "Rabbi", en: "my Lord" },
       { ar: "صَلِّ", tr: "salli", en: "send blessings" },
@@ -1479,7 +1513,7 @@ const namazPhrases = [
     arabic: "بِحَوْلِ اللّٰهِ وَقُوَّتِهِ أَقُومُ وَأَقْعُدُ",
     translit: "Bihawlillahi wa quwwatihi aqumu wa aq'ud",
     english: "By the power and strength of Allah, I stand and I sit.",
-    note: "Recited while rising for the next rak'ah — all movement is by God's strength.",
+    note: "Rising for the next rak'ah.",
     words: [
       { ar: "بِحَوْلِ", tr: "bihawli", en: "by the power" },
       { ar: "اللّٰهِ", tr: "Allah", en: "of Allah" },
@@ -1495,7 +1529,7 @@ const tashahhudPhrases = [
     arabic: "الْحَمْدُ لِلّٰهِ",
     translit: "Alhamdu lillah",
     english: "All praise belongs to Allah.",
-    note: "Tashahhud opens with praise before the testimony.",
+    note: "Tashahhud opens with praise.",
     words: [
       { ar: "الْحَمْدُ", tr: "al-hamdu", en: "all praise" },
       { ar: "لِلّٰهِ", tr: "lillah", en: "belongs to Allah" },
@@ -1505,7 +1539,7 @@ const tashahhudPhrases = [
     arabic: "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
     translit: "Ashhadu an la ilaha illallahu wahdahu la sharika lah",
     english: "I bear witness that there is no deity except Allah alone, Who has no partner.",
-    note: "The first testimony — oneness, alone, without partner.",
+    note: "First testimony — oneness.",
     words: [
       { ar: "أَشْهَدُ", tr: "ashhadu", en: "I bear witness" },
       { ar: "أَنْ", tr: "an", en: "that" },
@@ -1522,7 +1556,7 @@ const tashahhudPhrases = [
     arabic: "وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
     translit: "Wa ashhadu anna Muhammadan 'abduhu wa rasuluh",
     english: "And I bear witness that Muhammad is His servant and His Messenger.",
-    note: "The second testimony — servanthood mentioned before messengership.",
+    note: "Second testimony — servant & Messenger.",
     words: [
       { ar: "وَأَشْهَدُ", tr: "wa ashhadu", en: "and I bear witness" },
       { ar: "أَنَّ", tr: "anna", en: "that" },
@@ -1535,7 +1569,7 @@ const tashahhudPhrases = [
     arabic: "اللّٰهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ",
     translit: "Allahumma salli 'ala Muhammadin wa ali Muhammad",
     english: "O Allah, send blessings upon Muhammad and the family of Muhammad.",
-    note: "Tashahhud closes with salawat upon the Prophet and his family.",
+    note: "Closes with salawat.",
     words: [
       { ar: "اللّٰهُمَّ", tr: "Allahumma", en: "O Allah" },
       { ar: "صَلِّ", tr: "salli", en: "send blessings" },
@@ -1552,7 +1586,7 @@ const salamPhrases = [
     arabic: "السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ",
     translit: "As-salamu 'alayka ayyuhan Nabiyyu wa rahmatullahi wa barakatuh",
     english: "Peace be upon you, O Prophet, and the mercy of Allah and His blessings.",
-    note: "First salam — addressed to the Prophet ﷺ.",
+    note: "First salam — to the Prophet ﷺ.",
     words: [
       { ar: "السَّلَامُ", tr: "as-salamu", en: "peace" },
       { ar: "عَلَيْكَ", tr: "'alayka", en: "be upon you" },
@@ -1567,7 +1601,7 @@ const salamPhrases = [
     arabic: "السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللّٰهِ الصَّالِحِينَ",
     translit: "As-salamu 'alayna wa 'ala 'ibadillahis salihin",
     english: "Peace be upon us and upon the righteous servants of Allah.",
-    note: "Second salam — upon oneself and all the righteous.",
+    note: "Second salam — us & the righteous.",
     words: [
       { ar: "السَّلَامُ", tr: "as-salamu", en: "peace" },
       { ar: "عَلَيْنَا", tr: "'alayna", en: "be upon us" },
@@ -1581,7 +1615,7 @@ const salamPhrases = [
     arabic: "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ",
     translit: "As-salamu 'alaykum wa rahmatullahi wa barakatuh",
     english: "Peace be upon you, and the mercy of Allah and His blessings.",
-    note: "Final salam — the prayer concludes with peace upon all.",
+    note: "Final salam — peace upon all.",
     words: [
       { ar: "السَّلَامُ", tr: "as-salamu", en: "peace" },
       { ar: "عَلَيْكُمْ", tr: "'alaykum", en: "be upon you (all)" },
@@ -1721,6 +1755,7 @@ function selectPhrase(idx) {
 
   // Section navigation buttons
   const si = allItems[idx].sectionIdx;
+  document.getElementById('current-section-name').textContent = sections[si].title;
   const btnLast = document.getElementById('btn-last-section');
   const btnNext2 = document.getElementById('btn-next-section');
 
