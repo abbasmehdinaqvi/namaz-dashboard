@@ -340,6 +340,65 @@
     100% { opacity: 0; }
   }
 
+  /* ── Section change splash ── */
+  #section-splash {
+    position: fixed;
+    inset: 0;
+    background: rgba(13,27,42,0.92);
+    backdrop-filter: blur(6px);
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+
+  #section-splash.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #section-splash svg {
+    animation: spinRing 20s linear infinite;
+    margin-bottom: 4px;
+  }
+
+  .splash-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(200,152,58,0.6);
+  }
+
+  .splash-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(26px, 6vw, 40px);
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--gold2);
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  #section-splash.show svg,
+  #section-splash.show .splash-eyebrow,
+  #section-splash.show .splash-title {
+    animation: splashRise 0.4s ease both;
+  }
+
+  #section-splash.show svg { animation: splashRise 0.4s ease both, spinRing 20s linear infinite; }
+
+  @keyframes splashRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   .arabesque-ring {
     width: 48px; height: 48px;
     margin: 0 auto 12px;
@@ -411,7 +470,7 @@
   /* ── Word grid ── */
   #word-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 12px;
     align-content: start;
     flex: 1 1 auto;
@@ -432,11 +491,16 @@
     background: var(--navy2);
     border: 1px solid rgba(200,152,58,0.12);
     border-radius: 10px;
-    padding: 16px 18px;
+    padding: 12px 16px 12px 32px;
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     cursor: default;
     position: relative;
     overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 62px;
   }
 
   .word-card::before {
@@ -452,14 +516,21 @@
   .word-card:hover { border-color: rgba(200,152,58,0.4); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.3); }
   .word-card:hover::before { opacity: 1; }
 
+  .word-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
   .word-card .arabic {
     font-family: 'Amiri', serif;
     font-size: 24px;
     color: var(--gold3);
     direction: rtl;
     text-align: right;
-    margin-bottom: 8px;
     line-height: 1.4;
+    white-space: nowrap;
   }
 
   .word-card .translit {
@@ -468,18 +539,19 @@
     font-weight: 600;
     color: var(--ivory);
     letter-spacing: 0.04em;
-    margin-bottom: 4px;
   }
 
   .word-card .meaning {
     font-size: 12px;
     color: var(--muted);
-    line-height: 1.5;
+    line-height: 1.4;
   }
 
   .word-card .word-num {
     position: absolute;
-    top: 10px; left: 12px;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 10px;
     color: rgba(200,152,58,0.3);
@@ -697,15 +769,16 @@
       margin-bottom: 8px;
     }
 
-    /* Word grid → 2 cols on phone */
+    /* Word grid → compact single-column rows on phone */
     #word-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      grid-template-columns: 1fr;
+      gap: 8px;
     }
 
-    .word-card { padding: 14px 14px 14px; }
-    .word-card .arabic { font-size: 20px; }
-    .word-card .word-num { top: 8px; left: 10px; }
+    .word-card { padding: 10px 14px 10px 30px; min-height: 54px; gap: 10px; }
+    .word-card .arabic { font-size: 21px; }
+    .word-card .translit { font-size: 13px; }
+    .word-card .meaning { font-size: 11px; }
 
     #section-nav { margin-top: 0; padding-top: 10px; gap: 10px; }
     .section-nav-btn { opacity: 0.8; }
@@ -746,8 +819,8 @@
   }
 
   @media (max-width: 400px) {
-    #word-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .word-card .arabic { font-size: 18px; }
+    #word-grid { grid-template-columns: 1fr; gap: 8px; }
+    .word-card .arabic { font-size: 19px; }
     .hero-arabic { font-size: 22px; }
   }
 
@@ -873,7 +946,7 @@
         <span class="tag">Twelver Shia</span>
         <span class="tag">Arabic</span>
       </div>
-      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.7</span>
+      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.8</span>
     </div>
   </main>
 
@@ -890,6 +963,17 @@
 
   <!-- Swipe hint -->
   <div id="swipe-hint">&#8592; &nbsp;Swipe to navigate&nbsp; &#8594;</div>
+
+  <!-- Section change splash -->
+  <div id="section-splash">
+    <svg width="56" height="56" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="37" stroke="#C8983A" stroke-width="1" stroke-dasharray="4 3" opacity="0.6"/>
+      <polygon points="40,8 44,28 62,22 48,36 68,40 48,44 62,58 44,52 40,72 36,52 18,58 32,44 12,40 32,36 18,22 36,28" fill="none" stroke="#C8983A" stroke-width="1" opacity="0.5"/>
+      <circle cx="40" cy="40" r="5" fill="#C8983A" opacity="0.7"/>
+    </svg>
+    <div class="splash-eyebrow">Section</div>
+    <div class="splash-title" id="splash-title"></div>
+  </div>
 
 </div>
 
@@ -1742,9 +1826,11 @@ function selectPhrase(idx) {
     card.style.animationDelay = `${i * 0.05}s`;
     card.innerHTML = `
       <span class="word-num">${String(i + 1).padStart(2, '0')}</span>
+      <div class="word-text-block">
+        <div class="translit">${w.tr}</div>
+        <div class="meaning">${w.en}</div>
+      </div>
       <div class="arabic">${w.ar}</div>
-      <div class="translit">${w.tr}</div>
-      <div class="meaning">${w.en}</div>
     `;
     grid.appendChild(card);
   });
@@ -1756,6 +1842,17 @@ function selectPhrase(idx) {
   // Section navigation buttons
   const si = allItems[idx].sectionIdx;
   document.getElementById('current-section-name').textContent = sections[si].title;
+
+  // Splash on section change (not on initial load)
+  if (typeof selectPhrase.lastSection === 'number' && selectPhrase.lastSection !== si) {
+    const splash = document.getElementById('section-splash');
+    document.getElementById('splash-title').textContent = sections[si].title;
+    splash.classList.add('show');
+    clearTimeout(selectPhrase.splashTimer);
+    selectPhrase.splashTimer = setTimeout(() => splash.classList.remove('show'), 950);
+  }
+  selectPhrase.lastSection = si;
+
   const btnLast = document.getElementById('btn-last-section');
   const btnNext2 = document.getElementById('btn-next-section');
 
