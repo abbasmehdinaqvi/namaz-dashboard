@@ -187,6 +187,7 @@
     overflow: hidden;
     background: var(--navy);
     min-width: 0;
+    position: relative;
   }
 
   /* ── Top bar ── */
@@ -384,8 +385,7 @@
     margin-top: 4px;
   }
 
-  .divider::before, .divider::after {
-    content: '';
+  .divider-line {
     flex: 1;
     height: 1px;
     background: rgba(200,152,58,0.18);
@@ -465,6 +465,77 @@
     letter-spacing: 1px;
   }
 
+  /* ── Section navigation — intentionally subtle ── */
+  #section-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(200,152,58,0.08);
+  }
+
+  .section-nav-btn {
+    background: none;
+    border: none;
+    padding: 6px 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+    opacity: 0.55;
+    transition: opacity 0.2s;
+  }
+
+  .section-nav-btn:last-child { text-align: right; align-items: flex-end; }
+
+  .section-nav-btn:hover { opacity: 1; }
+
+  .section-nav-btn:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .snb-dir {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .snb-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  .section-nav-btn:hover .snb-title { color: var(--gold2); }
+
+  /* ── Slide arrows in the Word Breakdown divider — primary navigation ── */
+  .side-arrow {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(200,152,58,0.35);
+    background: rgba(21,34,52,0.85);
+    color: var(--gold2);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+
+  .side-arrow:hover {
+    background: rgba(200,152,58,0.18);
+    border-color: var(--gold);
+    transform: scale(1.08);
+  }
+
+  .side-arrow:disabled { opacity: 0.15; cursor: default; transform: none; }
+
   /* ── Footer bar ── */
   #footer-bar {
     padding: 12px 48px;
@@ -507,8 +578,9 @@
     background: rgba(0,0,0,0.6);
     z-index: 99;
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, visibility 0.3s;
   }
 
   /* ══════════════════════════════════════════
@@ -542,7 +614,7 @@
     }
 
     #drawer-overlay { display: block; }
-    #drawer-overlay.visible { opacity: 1; pointer-events: all; }
+    #drawer-overlay.visible { opacity: 1; visibility: visible; pointer-events: all; }
 
     /* Main takes full height minus bottom bar */
     #main {
@@ -586,6 +658,24 @@
     .word-card { padding: 14px 14px 14px; }
     .word-card .arabic { font-size: 20px; }
     .word-card .word-num { top: 8px; left: 10px; }
+
+    #section-nav { margin-top: 24px; padding-top: 12px; gap: 10px; }
+    .section-nav-btn { padding: 6px 2px; }
+    .snb-title { font-size: 12px; }
+
+    /* Divider arrows: smaller on phone, still visible alongside bottom bar + swipe */
+    .side-arrow { width: 36px; height: 36px; font-size: 16px; }
+    .divider { gap: 10px; }
+
+    /* Bottom bar slide arrows get primary visual weight */
+    #bottom-bar .nav-btn {
+      background: rgba(200,152,58,0.15);
+      border-color: rgba(200,152,58,0.5);
+    }
+    #bottom-bar .nav-btn:disabled {
+      background: transparent;
+      border-color: rgba(200,152,58,0.3);
+    }
 
     /* Footer: just the note, no tags */
     #footer-bar {
@@ -705,10 +795,25 @@
       </div>
 
       <div class="divider">
+        <button class="side-arrow" id="btn-prev-side" title="Previous">&#8592;</button>
+        <span class="divider-line"></span>
         <span class="divider-label">Word Breakdown</span>
+        <span class="divider-line"></span>
+        <button class="side-arrow" id="btn-next-side" title="Next">&#8594;</button>
       </div>
 
       <div id="word-grid"></div>
+
+      <div id="section-nav">
+        <button class="section-nav-btn" id="btn-last-section">
+          <span class="snb-dir">&#8592; Last Section</span>
+          <span class="snb-title" id="last-section-title"></span>
+        </button>
+        <button class="section-nav-btn" id="btn-next-section">
+          <span class="snb-dir">Next Section &#8594;</span>
+          <span class="snb-title" id="next-section-title"></span>
+        </button>
+      </div>
     </div>
 
     <div id="footer-bar">
@@ -717,6 +822,7 @@
         <span class="tag">Twelver Shia</span>
         <span class="tag">Arabic</span>
       </div>
+      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v3.2</span>
     </div>
   </main>
 
@@ -998,7 +1104,7 @@ const duaPhrases = [
     arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
     translit: "Rabbana atina fid dunya hasanatan wa fil akhirati hasanatan wa qina 'adhaban nar",
     english: "Our Lord, grant us good in this world and good in the Hereafter, and protect us from the punishment of the Fire.",
-    note: "Quran 2:201 — the most comprehensive dua, asking for goodness in both worlds.",
+    note: "Quran 2:201 — the most comprehensive dua; commonly recited in Qunoot during namaz.",
     words: [
       { ar: "رَبَّنَا", tr: "Rabbana", en: "Our Lord" },
       { ar: "آتِنَا", tr: "atina", en: "grant us / give us" },
@@ -1014,45 +1120,532 @@ const duaPhrases = [
   },
 ];
 
-// Unified list: { section, phrase, sectionIdx }
-const allItems = [
-  ...phrases.map((p, i) => ({ section: 'azan', phrase: p, sectionIdx: i })),
-  ...duaPhrases.map((p, i) => ({ section: 'dua', phrase: p, sectionIdx: i })),
+const hamdPhrases = [
+  {
+    arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+    translit: "Bismillahir Rahmanir Rahim",
+    english: "In the name of Allah, the Most Compassionate, the Most Merciful.",
+    note: "Verse 1 — the Basmala; in the Shia reading it is counted as the first verse of the Surah.",
+    words: [
+      { ar: "بِسْمِ", tr: "Bismi", en: "In the name" },
+      { ar: "اللَّهِ", tr: "Allah", en: "Allah" },
+      { ar: "الرَّحْمَٰنِ", tr: "ar-Rahman", en: "the Most Compassionate" },
+      { ar: "الرَّحِيمِ", tr: "ar-Rahim", en: "the Most Merciful" },
+    ]
+  },
+  {
+    arabic: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+    translit: "Alhamdu lillahi Rabbil 'alamin",
+    english: "All praise belongs to Allah, Lord of all the worlds.",
+    note: "Verse 2 — the verse the Surah is named after: al-Hamd, the praise.",
+    words: [
+      { ar: "الْحَمْدُ", tr: "al-hamdu", en: "all praise" },
+      { ar: "لِلَّهِ", tr: "lillahi", en: "belongs to Allah" },
+      { ar: "رَبِّ", tr: "Rabbi", en: "Lord" },
+      { ar: "الْعَالَمِينَ", tr: "al-'alamin", en: "of all the worlds" },
+    ]
+  },
+  {
+    arabic: "الرَّحْمَٰنِ الرَّحِيمِ",
+    translit: "Ar-Rahmanir Rahim",
+    english: "The Most Compassionate, the Most Merciful.",
+    note: "Verse 3 — mercy repeated, framing how the Lord of the worlds relates to creation.",
+    words: [
+      { ar: "الرَّحْمَٰنِ", tr: "ar-Rahman", en: "the Most Compassionate" },
+      { ar: "الرَّحِيمِ", tr: "ar-Rahim", en: "the Most Merciful" },
+    ]
+  },
+  {
+    arabic: "مَالِكِ يَوْمِ الدِّينِ",
+    translit: "Maliki yawmid din",
+    english: "Master of the Day of Judgment.",
+    note: "Verse 4 — sovereignty over the day when all accounts are settled.",
+    words: [
+      { ar: "مَالِكِ", tr: "Maliki", en: "Master / Owner" },
+      { ar: "يَوْمِ", tr: "yawmi", en: "of the Day" },
+      { ar: "الدِّينِ", tr: "ad-din", en: "of Judgment / Recompense" },
+    ]
+  },
+  {
+    arabic: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+    translit: "Iyyaka na'budu wa iyyaka nasta'in",
+    english: "You alone we worship, and You alone we ask for help.",
+    note: "Verse 5 — the pivot of the Surah: from praising God to addressing Him directly.",
+    words: [
+      { ar: "إِيَّاكَ", tr: "iyyaka", en: "You alone" },
+      { ar: "نَعْبُدُ", tr: "na'budu", en: "we worship" },
+      { ar: "وَ", tr: "wa", en: "and" },
+      { ar: "نَسْتَعِينُ", tr: "nasta'in", en: "we seek help" },
+    ]
+  },
+  {
+    arabic: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+    translit: "Ihdinas siratal mustaqim",
+    english: "Guide us on the straight path.",
+    note: "Verse 6 — the central request of the entire Surah: guidance.",
+    words: [
+      { ar: "اهْدِنَا", tr: "ihdina", en: "guide us" },
+      { ar: "الصِّرَاطَ", tr: "as-sirata", en: "the path" },
+      { ar: "الْمُسْتَقِيمَ", tr: "al-mustaqim", en: "the straight" },
+    ]
+  },
+  {
+    arabic: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+    translit: "Siratal ladhina an'amta 'alayhim ghayril maghdubi 'alayhim wa lad dallin",
+    english: "The path of those You have blessed — not of those who earned Your anger, nor of those who went astray.",
+    note: "Verse 7 — the straight path defined by those who walked it before.",
+    words: [
+      { ar: "صِرَاطَ", tr: "sirata", en: "the path" },
+      { ar: "الَّذِينَ", tr: "alladhina", en: "of those who" },
+      { ar: "أَنْعَمْتَ", tr: "an'amta", en: "You have blessed" },
+      { ar: "عَلَيْهِمْ", tr: "'alayhim", en: "upon them" },
+      { ar: "غَيْرِ", tr: "ghayri", en: "not of" },
+      { ar: "الْمَغْضُوبِ", tr: "al-maghdubi", en: "those who earned anger" },
+      { ar: "وَلَا", tr: "wa la", en: "and not" },
+      { ar: "الضَّالِّينَ", tr: "ad-dallin", en: "those who went astray" },
+    ]
+  },
 ];
+
+// ── Sections registry — add new sections here ──
+const ikhlasPhrases = [
+  {
+    arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+    translit: "Bismillahir Rahmanir Rahim",
+    english: "In the name of Allah, the Most Compassionate, the Most Merciful.",
+    note: "The Basmala — opening of Surah Al-Ikhlas.",
+    words: [
+      { ar: "بِسْمِ", tr: "Bismi", en: "In the name" },
+      { ar: "اللَّهِ", tr: "Allah", en: "Allah" },
+      { ar: "الرَّحْمَٰنِ", tr: "ar-Rahman", en: "the Most Compassionate" },
+      { ar: "الرَّحِيمِ", tr: "ar-Rahim", en: "the Most Merciful" },
+    ]
+  },
+  {
+    arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ",
+    translit: "Qul huwallahu ahad",
+    english: "Say: He is Allah, the One.",
+    note: "Verse 1 — absolute oneness; the Surah is called 'al-Ikhlas', pure sincerity of belief.",
+    words: [
+      { ar: "قُلْ", tr: "qul", en: "say" },
+      { ar: "هُوَ", tr: "huwa", en: "He is" },
+      { ar: "اللَّهُ", tr: "Allahu", en: "Allah" },
+      { ar: "أَحَدٌ", tr: "ahad", en: "the One / Unique" },
+    ]
+  },
+  {
+    arabic: "اللَّهُ الصَّمَدُ",
+    translit: "Allahus samad",
+    english: "Allah, the Eternal, the Absolute.",
+    note: "Verse 2 — as-Samad: the self-sufficient one whom all depend upon.",
+    words: [
+      { ar: "اللَّهُ", tr: "Allahu", en: "Allah" },
+      { ar: "الصَّمَدُ", tr: "as-samad", en: "the Eternal / Self-Sufficient" },
+    ]
+  },
+  {
+    arabic: "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+    translit: "Lam yalid wa lam yulad",
+    english: "He neither begets nor is born.",
+    note: "Verse 3 — negation of lineage; God is beyond parenthood and origin.",
+    words: [
+      { ar: "لَمْ", tr: "lam", en: "not" },
+      { ar: "يَلِدْ", tr: "yalid", en: "He begets" },
+      { ar: "وَلَمْ", tr: "wa lam", en: "and not" },
+      { ar: "يُولَدْ", tr: "yulad", en: "He is born" },
+    ]
+  },
+  {
+    arabic: "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
+    translit: "Wa lam yakul lahu kufuwan ahad",
+    english: "And there is none comparable to Him.",
+    note: "Verse 4 — the seal of Tawhid: nothing in existence resembles Him.",
+    words: [
+      { ar: "وَلَمْ", tr: "wa lam", en: "and not" },
+      { ar: "يَكُن", tr: "yakun", en: "there is" },
+      { ar: "لَّهُ", tr: "lahu", en: "to Him" },
+      { ar: "كُفُوًا", tr: "kufuwan", en: "comparable / equal" },
+      { ar: "أَحَدٌ", tr: "ahad", en: "anyone" },
+    ]
+  },
+];
+
+const tasbihPhrases = [
+  {
+    arabic: "سُبْحَانَ اللَّهِ",
+    translit: "Subhanallah",
+    english: "Glory be to Allah.",
+    note: "First tasbih — declaring Allah free of every imperfection.",
+    words: [
+      { ar: "سُبْحَانَ", tr: "subhana", en: "glory be / exalted is" },
+      { ar: "اللَّهِ", tr: "Allah", en: "Allah" },
+    ]
+  },
+  {
+    arabic: "وَالْحَمْدُ لِلَّهِ",
+    translit: "Wal hamdu lillah",
+    english: "And all praise belongs to Allah.",
+    note: "Second tasbih — gratitude and praise for every blessing.",
+    words: [
+      { ar: "وَ", tr: "wa", en: "and" },
+      { ar: "الْحَمْدُ", tr: "al-hamdu", en: "all praise" },
+      { ar: "لِلَّهِ", tr: "lillah", en: "belongs to Allah" },
+    ]
+  },
+  {
+    arabic: "وَلَا إِلَٰهَ إِلَّا اللَّهُ",
+    translit: "Wa la ilaha illallah",
+    english: "And there is no deity except Allah.",
+    note: "Third tasbih — the declaration of oneness at the center of the four.",
+    words: [
+      { ar: "وَلَا", tr: "wa la", en: "and no" },
+      { ar: "إِلَٰهَ", tr: "ilaha", en: "deity" },
+      { ar: "إِلَّا", tr: "illa", en: "except" },
+      { ar: "اللَّهُ", tr: "Allah", en: "Allah" },
+    ]
+  },
+  {
+    arabic: "وَاللَّهُ أَكْبَرُ",
+    translit: "Wallahu akbar",
+    english: "And Allah is the Greatest.",
+    note: "Fourth tasbih — recited together in the 3rd and 4th rak'ah of namaz in place of Surah Al-Hamd.",
+    words: [
+      { ar: "وَ", tr: "wa", en: "and" },
+      { ar: "اللَّهُ", tr: "Allahu", en: "Allah" },
+      { ar: "أَكْبَرُ", tr: "akbar", en: "the Greatest" },
+    ]
+  },
+];
+
+const ibrahimPhrases = [
+  {
+    arabic: "رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِن ذُرِّيَّتِي",
+    translit: "Rabbij 'alni muqimas salati wa min dhurriyyati",
+    english: "My Lord, make me an establisher of prayer, and from my descendants too.",
+    note: "Ibrahim 14:40 — Prophet Ibrahim's dua for himself and his offspring to uphold salah.",
+    words: [
+      { ar: "رَبِّ", tr: "Rabbi", en: "my Lord" },
+      { ar: "اجْعَلْنِي", tr: "aj'alni", en: "make me" },
+      { ar: "مُقِيمَ", tr: "muqima", en: "an establisher" },
+      { ar: "الصَّلَاةِ", tr: "as-salati", en: "of prayer" },
+      { ar: "وَمِن", tr: "wa min", en: "and from" },
+      { ar: "ذُرِّيَّتِي", tr: "dhurriyyati", en: "my descendants" },
+    ]
+  },
+  {
+    arabic: "رَبَّنَا وَتَقَبَّلْ دُعَاءِ",
+    translit: "Rabbana wa taqabbal du'a",
+    english: "Our Lord, and accept my supplication.",
+    note: "Ibrahim 14:40 (continuation) — asking that the dua itself be accepted.",
+    words: [
+      { ar: "رَبَّنَا", tr: "Rabbana", en: "our Lord" },
+      { ar: "وَتَقَبَّلْ", tr: "wa taqabbal", en: "and accept" },
+      { ar: "دُعَاءِ", tr: "du'a'i", en: "my supplication" },
+    ]
+  },
+  {
+    arabic: "رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+    translit: "Rabbanagh fir li wa li walidayya wa lil mu'minina yawma yaqumul hisab",
+    english: "Our Lord, forgive me, my parents, and the believers on the Day the account is established.",
+    note: "Ibrahim 14:41 — forgiveness for oneself, one's parents, and all believers.",
+    words: [
+      { ar: "رَبَّنَا", tr: "Rabbana", en: "our Lord" },
+      { ar: "اغْفِرْ", tr: "ighfir", en: "forgive" },
+      { ar: "لِي", tr: "li", en: "me" },
+      { ar: "وَلِوَالِدَيَّ", tr: "wa li walidayya", en: "and my parents" },
+      { ar: "وَلِلْمُؤْمِنِينَ", tr: "wa lil mu'minina", en: "and the believers" },
+      { ar: "يَوْمَ", tr: "yawma", en: "on the Day" },
+      { ar: "يَقُومُ", tr: "yaqumu", en: "is established" },
+      { ar: "الْحِسَابُ", tr: "al-hisab", en: "the account / reckoning" },
+    ]
+  },
+];
+
+const israPhrases = [
+  {
+    arabic: "رَّبِّ أَدْخِلْنِي مُدْخَلَ صِدْقٍ وَأَخْرِجْنِي مُخْرَجَ صِدْقٍ",
+    translit: "Rabbi adkhilni mudkhala sidqin wa akhrijni mukhraja sidqin",
+    english: "My Lord, cause me to enter a sound entrance and to exit a sound exit.",
+    note: "Isra 17:80 — truthfulness in every beginning and every ending.",
+    words: [
+      { ar: "رَّبِّ", tr: "Rabbi", en: "my Lord" },
+      { ar: "أَدْخِلْنِي", tr: "adkhilni", en: "cause me to enter" },
+      { ar: "مُدْخَلَ", tr: "mudkhala", en: "an entrance" },
+      { ar: "صِدْقٍ", tr: "sidqin", en: "of truth / soundness" },
+      { ar: "وَأَخْرِجْنِي", tr: "wa akhrijni", en: "and cause me to exit" },
+      { ar: "مُخْرَجَ", tr: "mukhraja", en: "an exit" },
+      { ar: "صِدْقٍ", tr: "sidqin", en: "of truth / soundness" },
+    ]
+  },
+  {
+    arabic: "وَاجْعَل لِّي مِن لَّدُنكَ سُلْطَانًا نَّصِيرًا",
+    translit: "Waj'al li mil ladunka sultanan nasira",
+    english: "And grant me from Yourself a supporting authority.",
+    note: "Isra 17:80 (continuation) — strength and support that comes from God alone.",
+    words: [
+      { ar: "وَاجْعَل", tr: "waj'al", en: "and grant / make" },
+      { ar: "لِّي", tr: "li", en: "for me" },
+      { ar: "مِن لَّدُنكَ", tr: "mil ladunka", en: "from Yourself" },
+      { ar: "سُلْطَانًا", tr: "sultanan", en: "an authority / power" },
+      { ar: "نَّصِيرًا", tr: "nasira", en: "supporting / helping" },
+    ]
+  },
+];
+
+const namazPhrases = [
+  {
+    arabic: "سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ",
+    translit: "Subhana Rabbiyal 'Azimi wa bihamdih",
+    english: "Glory be to my Lord, the Most Great, and all praise belongs to Him.",
+    note: "Ruku — the dhikr of bowing.",
+    words: [
+      { ar: "سُبْحَانَ", tr: "subhana", en: "glory be to" },
+      { ar: "رَبِّيَ", tr: "Rabbiya", en: "my Lord" },
+      { ar: "الْعَظِيمِ", tr: "al-'Azimi", en: "the Most Great" },
+      { ar: "وَبِحَمْدِهِ", tr: "wa bihamdih", en: "and with His praise" },
+    ]
+  },
+  {
+    arabic: "سَمِعَ اللّٰهُ لِمَنْ حَمِدَهُ",
+    translit: "Sami' Allahu liman hamidah",
+    english: "Allah hears the one who praises Him.",
+    note: "Recited while standing upright after rising from ruku.",
+    words: [
+      { ar: "سَمِعَ", tr: "sami'a", en: "hears" },
+      { ar: "اللّٰهُ", tr: "Allahu", en: "Allah" },
+      { ar: "لِمَنْ", tr: "liman", en: "the one who" },
+      { ar: "حَمِدَهُ", tr: "hamidah", en: "praises Him" },
+    ]
+  },
+  {
+    arabic: "سُبْحَانَ رَبِّيَ الْأَعْلَى وَبِحَمْدِهِ",
+    translit: "Subhana Rabbiyal A'la wa bihamdih",
+    english: "Glory be to my Lord, the Most High, and all praise belongs to Him.",
+    note: "Sajdah — the dhikr of prostration, recited in both the first and second sajdah.",
+    words: [
+      { ar: "سُبْحَانَ", tr: "subhana", en: "glory be to" },
+      { ar: "رَبِّيَ", tr: "Rabbiya", en: "my Lord" },
+      { ar: "الْأَعْلَى", tr: "al-A'la", en: "the Most High" },
+      { ar: "وَبِحَمْدِهِ", tr: "wa bihamdih", en: "and with His praise" },
+    ]
+  },
+  {
+    arabic: "أَسْتَغْفِرُ اللّٰهَ رَبِّي وَأَتُوبُ إِلَيْهِ",
+    translit: "Astaghfirullaha Rabbi wa atubu ilayh",
+    english: "I seek forgiveness from Allah, my Lord, and I repent to Him.",
+    note: "Recited while sitting between the two sajdahs.",
+    words: [
+      { ar: "أَسْتَغْفِرُ", tr: "astaghfiru", en: "I seek forgiveness" },
+      { ar: "اللّٰهَ", tr: "Allah", en: "Allah" },
+      { ar: "رَبِّي", tr: "Rabbi", en: "my Lord" },
+      { ar: "وَأَتُوبُ", tr: "wa atubu", en: "and I repent" },
+      { ar: "إِلَيْهِ", tr: "ilayh", en: "to Him" },
+    ]
+  },
+  {
+    arabic: "رَبِّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ وَعَجِّلْ فَرَجَهُمْ",
+    translit: "Rabbi salli 'ala Muhammadin wa ali Muhammad wa 'ajjil farajahum",
+    english: "My Lord, send blessings upon Muhammad and the family of Muhammad, and hasten their relief.",
+    note: "Recommended dhikr (not obligatory) — commonly recited while seated after sajdah in Twelver practice.",
+    words: [
+      { ar: "رَبِّ", tr: "Rabbi", en: "my Lord" },
+      { ar: "صَلِّ", tr: "salli", en: "send blessings" },
+      { ar: "عَلَى", tr: "'ala", en: "upon" },
+      { ar: "مُحَمَّدٍ", tr: "Muhammadin", en: "Muhammad" },
+      { ar: "وَآلِ", tr: "wa ali", en: "and the family of" },
+      { ar: "مُحَمَّدٍ", tr: "Muhammad", en: "Muhammad" },
+      { ar: "وَعَجِّلْ", tr: "wa 'ajjil", en: "and hasten" },
+      { ar: "فَرَجَهُمْ", tr: "farajahum", en: "their relief" },
+    ]
+  },
+  {
+    arabic: "بِحَوْلِ اللّٰهِ وَقُوَّتِهِ أَقُومُ وَأَقْعُدُ",
+    translit: "Bihawlillahi wa quwwatihi aqumu wa aq'ud",
+    english: "By the power and strength of Allah, I stand and I sit.",
+    note: "Recited while rising for the next rak'ah — all movement is by God's strength.",
+    words: [
+      { ar: "بِحَوْلِ", tr: "bihawli", en: "by the power" },
+      { ar: "اللّٰهِ", tr: "Allah", en: "of Allah" },
+      { ar: "وَقُوَّتِهِ", tr: "wa quwwatihi", en: "and His strength" },
+      { ar: "أَقُومُ", tr: "aqumu", en: "I stand" },
+      { ar: "وَأَقْعُدُ", tr: "wa aq'ud", en: "and I sit" },
+    ]
+  },
+];
+
+const tashahhudPhrases = [
+  {
+    arabic: "الْحَمْدُ لِلّٰهِ",
+    translit: "Alhamdu lillah",
+    english: "All praise belongs to Allah.",
+    note: "Tashahhud opens with praise before the testimony.",
+    words: [
+      { ar: "الْحَمْدُ", tr: "al-hamdu", en: "all praise" },
+      { ar: "لِلّٰهِ", tr: "lillah", en: "belongs to Allah" },
+    ]
+  },
+  {
+    arabic: "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+    translit: "Ashhadu an la ilaha illallahu wahdahu la sharika lah",
+    english: "I bear witness that there is no deity except Allah alone, Who has no partner.",
+    note: "The first testimony — oneness, alone, without partner.",
+    words: [
+      { ar: "أَشْهَدُ", tr: "ashhadu", en: "I bear witness" },
+      { ar: "أَنْ", tr: "an", en: "that" },
+      { ar: "لَا", tr: "la", en: "no" },
+      { ar: "إِلٰهَ", tr: "ilaha", en: "deity" },
+      { ar: "إِلَّا", tr: "illa", en: "except" },
+      { ar: "اللّٰهُ", tr: "Allahu", en: "Allah" },
+      { ar: "وَحْدَهُ", tr: "wahdahu", en: "alone" },
+      { ar: "لَا شَرِيكَ", tr: "la sharika", en: "no partner" },
+      { ar: "لَهُ", tr: "lah", en: "to Him" },
+    ]
+  },
+  {
+    arabic: "وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    translit: "Wa ashhadu anna Muhammadan 'abduhu wa rasuluh",
+    english: "And I bear witness that Muhammad is His servant and His Messenger.",
+    note: "The second testimony — servanthood mentioned before messengership.",
+    words: [
+      { ar: "وَأَشْهَدُ", tr: "wa ashhadu", en: "and I bear witness" },
+      { ar: "أَنَّ", tr: "anna", en: "that" },
+      { ar: "مُحَمَّدًا", tr: "Muhammadan", en: "Muhammad" },
+      { ar: "عَبْدُهُ", tr: "'abduhu", en: "His servant" },
+      { ar: "وَرَسُولُهُ", tr: "wa rasuluh", en: "and His Messenger" },
+    ]
+  },
+  {
+    arabic: "اللّٰهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ",
+    translit: "Allahumma salli 'ala Muhammadin wa ali Muhammad",
+    english: "O Allah, send blessings upon Muhammad and the family of Muhammad.",
+    note: "Tashahhud closes with salawat upon the Prophet and his family.",
+    words: [
+      { ar: "اللّٰهُمَّ", tr: "Allahumma", en: "O Allah" },
+      { ar: "صَلِّ", tr: "salli", en: "send blessings" },
+      { ar: "عَلَى", tr: "'ala", en: "upon" },
+      { ar: "مُحَمَّدٍ", tr: "Muhammadin", en: "Muhammad" },
+      { ar: "وَآلِ", tr: "wa ali", en: "and the family of" },
+      { ar: "مُحَمَّدٍ", tr: "Muhammad", en: "Muhammad" },
+    ]
+  },
+];
+
+const salamPhrases = [
+  {
+    arabic: "السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ",
+    translit: "As-salamu 'alayka ayyuhan Nabiyyu wa rahmatullahi wa barakatuh",
+    english: "Peace be upon you, O Prophet, and the mercy of Allah and His blessings.",
+    note: "First salam — addressed to the Prophet ﷺ.",
+    words: [
+      { ar: "السَّلَامُ", tr: "as-salamu", en: "peace" },
+      { ar: "عَلَيْكَ", tr: "'alayka", en: "be upon you" },
+      { ar: "أَيُّهَا", tr: "ayyuha", en: "O" },
+      { ar: "النَّبِيُّ", tr: "an-Nabiyyu", en: "the Prophet" },
+      { ar: "وَرَحْمَةُ", tr: "wa rahmatu", en: "and the mercy" },
+      { ar: "اللّٰهِ", tr: "Allah", en: "of Allah" },
+      { ar: "وَبَرَكَاتُهُ", tr: "wa barakatuh", en: "and His blessings" },
+    ]
+  },
+  {
+    arabic: "السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللّٰهِ الصَّالِحِينَ",
+    translit: "As-salamu 'alayna wa 'ala 'ibadillahis salihin",
+    english: "Peace be upon us and upon the righteous servants of Allah.",
+    note: "Second salam — upon oneself and all the righteous.",
+    words: [
+      { ar: "السَّلَامُ", tr: "as-salamu", en: "peace" },
+      { ar: "عَلَيْنَا", tr: "'alayna", en: "be upon us" },
+      { ar: "وَعَلَى", tr: "wa 'ala", en: "and upon" },
+      { ar: "عِبَادِ", tr: "'ibadi", en: "the servants" },
+      { ar: "اللّٰهِ", tr: "Allah", en: "of Allah" },
+      { ar: "الصَّالِحِينَ", tr: "as-salihin", en: "the righteous" },
+    ]
+  },
+  {
+    arabic: "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ",
+    translit: "As-salamu 'alaykum wa rahmatullahi wa barakatuh",
+    english: "Peace be upon you, and the mercy of Allah and His blessings.",
+    note: "Final salam — the prayer concludes with peace upon all.",
+    words: [
+      { ar: "السَّلَامُ", tr: "as-salamu", en: "peace" },
+      { ar: "عَلَيْكُمْ", tr: "'alaykum", en: "be upon you (all)" },
+      { ar: "وَرَحْمَةُ", tr: "wa rahmatu", en: "and the mercy" },
+      { ar: "اللّٰهِ", tr: "Allah", en: "of Allah" },
+      { ar: "وَبَرَكَاتُهُ", tr: "wa barakatuh", en: "and His blessings" },
+    ]
+  },
+];
+
+// ── Five top-level categories ──
+// Per-item tags preserve source references inside merged sections
+const tagAll = (arr, tag) => arr.map(p => ({ ...p, tag }));
+
+const sections = [
+  { key: 'azan', title: 'Azan & Iqamah', tag: 'Twelver Shia',
+    items: phrases },
+
+  { key: 'duas', title: 'Dua of Namaz', tag: 'Dua',
+    items: [
+      ...tagAll(duaPhrases, 'Dua After Azan'),
+      ...tagAll(ibrahimPhrases, 'Quran 14:40–41'),
+      ...tagAll(israPhrases, 'Quran 17:80'),
+    ] },
+
+  { key: 'surahs', title: 'Namaz Surah', tag: 'Quran',
+    items: [
+      ...tagAll(hamdPhrases, 'Quran 1:1–7'),
+      ...tagAll(ikhlasPhrases, 'Quran 112:1–4'),
+    ] },
+
+  { key: 'recitations', title: 'Namaz Recitations', tag: 'Recitation',
+    items: [
+      ...tagAll(namazPhrases, 'Ruku & Sujood'),
+      ...tagAll(tasbihPhrases, 'Tasbihat Arba\'a'),
+    ] },
+
+  { key: 'closing', title: 'Tashahhud & Salam', tag: 'Closing',
+    items: [
+      ...tagAll(tashahhudPhrases, 'Tashahhud'),
+      ...tagAll(salamPhrases, 'Salam'),
+    ] },
+];
+
+// Unified flat list: { sectionIdx, tag, phrase, localIdx }
+const allItems = sections.flatMap((s, si) =>
+  s.items.map((p, i) => ({ sectionIdx: si, tag: p.tag || s.tag, phrase: p, localIdx: i }))
+);
+
+// First global index of each section (for section jumping)
+const sectionStarts = [];
+{
+  let acc = 0;
+  sections.forEach(s => { sectionStarts.push(acc); acc += s.items.length; });
+}
 
 let current = 0;
 
 function buildSidebar() {
   const list = document.getElementById('phrase-list');
+  let globalIdx = 0;
 
-  // Azan section header
-  const h1 = document.createElement('div');
-  h1.className = 'section-header';
-  h1.textContent = 'Azan & Iqamah';
-  list.appendChild(h1);
+  sections.forEach(s => {
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.textContent = s.title;
+    list.appendChild(header);
 
-  phrases.forEach((p, i) => {
-    list.appendChild(makeItem(p, i, 'azan'));
-  });
-
-  // Dua section header
-  const h2 = document.createElement('div');
-  h2.className = 'section-header';
-  h2.textContent = 'Dua After Azan';
-  list.appendChild(h2);
-
-  duaPhrases.forEach((p, i) => {
-    list.appendChild(makeItem(p, phrases.length + i, 'dua'));
+    s.items.forEach((p, i) => {
+      list.appendChild(makeItem(p, globalIdx, i));
+      globalIdx++;
+    });
   });
 }
 
-function makeItem(p, globalIdx, section) {
+function makeItem(p, globalIdx, localIdx) {
   const item = document.createElement('div');
   item.className = 'phrase-item' + (globalIdx === 0 ? ' active' : '');
   item.dataset.idx = globalIdx;
-  const localNum = section === 'dua' ? globalIdx - phrases.length + 1 : globalIdx + 1;
   item.innerHTML = `
-    <span class="idx">${String(localNum).padStart(2, '0')}</span>
+    <span class="idx">${String(localIdx + 1).padStart(2, '0')}</span>
     <div class="phrase-text-block">
       <div class="phrase-arabic-mini">${p.arabic}</div>
       <div class="phrase-translit-mini">${p.translit}</div>
@@ -1073,7 +1666,6 @@ function selectPhrase(idx) {
   if (activeItem) activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 
   const p = allItems[idx].phrase;
-  const section = allItems[idx].section;
 
   document.getElementById('hero-arabic').textContent = p.arabic;
   document.getElementById('hero-translit').textContent = p.translit;
@@ -1108,9 +1700,26 @@ function selectPhrase(idx) {
 
   // Section tag
   const tags = document.querySelector('.tag-group');
-  tags.innerHTML = section === 'dua'
-    ? '<span class="tag">Dua After Azan</span><span class="tag">Arabic</span>'
-    : '<span class="tag">Twelver Shia</span><span class="tag">Arabic</span>';
+  tags.innerHTML = `<span class="tag">${allItems[idx].tag}</span><span class="tag">Arabic</span>`;
+
+  // Section navigation buttons
+  const si = allItems[idx].sectionIdx;
+  const btnLast = document.getElementById('btn-last-section');
+  const btnNext2 = document.getElementById('btn-next-section');
+
+  if (si > 0) {
+    btnLast.disabled = false;
+    document.getElementById('last-section-title').textContent = sections[si - 1].title;
+  } else {
+    btnLast.disabled = true;
+  }
+
+  if (si < sections.length - 1) {
+    btnNext2.disabled = false;
+    document.getElementById('next-section-title').textContent = sections[si + 1].title;
+  } else {
+    btnNext2.disabled = true;
+  }
 
   // Progress — update both desktop and mobile bars
   const pct = ((idx + 1) / allItems.length) * 100;
@@ -1122,6 +1731,8 @@ function selectPhrase(idx) {
   // Nav buttons — desktop
   document.getElementById('btn-prev').disabled = idx === 0;
   document.getElementById('btn-next').disabled = idx === allItems.length - 1;
+  document.getElementById('btn-prev-side').disabled = idx === 0;
+  document.getElementById('btn-next-side').disabled = idx === allItems.length - 1;
   // Nav buttons — mobile
   document.getElementById('btn-prev-m').disabled = idx === 0;
   document.getElementById('btn-next-m').disabled = idx === allItems.length - 1;
@@ -1147,6 +1758,8 @@ function closeDrawer() {
 // Desktop nav
 document.getElementById('btn-prev').addEventListener('click', () => goPrev());
 document.getElementById('btn-next').addEventListener('click', () => goNext());
+document.getElementById('btn-prev-side').addEventListener('click', () => goPrev());
+document.getElementById('btn-next-side').addEventListener('click', () => goNext());
 
 // Mobile bottom bar nav
 document.getElementById('btn-prev-m').addEventListener('click', () => goPrev());
@@ -1155,6 +1768,16 @@ document.getElementById('btn-next-m').addEventListener('click', () => goNext());
 // Mobile menu open
 document.getElementById('menu-btn').addEventListener('click', openDrawer);
 document.getElementById('list-btn').addEventListener('click', openDrawer);
+
+// Section navigation
+document.getElementById('btn-last-section').addEventListener('click', () => {
+  const si = allItems[current].sectionIdx;
+  if (si > 0) { swipeDir = 'right'; selectPhrase(sectionStarts[si - 1]); }
+});
+document.getElementById('btn-next-section').addEventListener('click', () => {
+  const si = allItems[current].sectionIdx;
+  if (si < sections.length - 1) { swipeDir = 'left'; selectPhrase(sectionStarts[si + 1]); }
+});
 
 // Close drawer
 document.getElementById('sidebar-close').addEventListener('click', closeDrawer);
