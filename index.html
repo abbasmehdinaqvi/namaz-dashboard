@@ -946,7 +946,7 @@
         <span class="tag">Twelver Shia</span>
         <span class="tag">Arabic</span>
       </div>
-      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v4.1</span>
+      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v4.2</span>
     </div>
   </main>
 
@@ -1714,6 +1714,21 @@ const salamPhrases = [
 // Per-item tags preserve source references inside merged sections
 const tagAll = (arr, tag) => arr.map(p => ({ ...p, tag }));
 
+const specialPhrases = [
+  {
+    arabic: "فِي الدُّنْيَا وَالْآخِرَةِ",
+    translit: "Fid dunya wal akhirah",
+    english: "In this world and the Hereafter.",
+    note: "A recurring Quranic phrase — both abodes, together.",
+    words: [
+      { ar: "فِي", tr: "fi", en: "in" },
+      { ar: "الدُّنْيَا", tr: "ad-dunya", en: "this world" },
+      { ar: "وَ", tr: "wa", en: "and" },
+      { ar: "الْآخِرَةِ", tr: "al-akhirah", en: "the Hereafter" },
+    ]
+  },
+];
+
 const sections = [
   { key: 'azan', title: 'Azan & Iqamah', tag: 'Twelver Shia',
     items: phrases },
@@ -1742,6 +1757,9 @@ const sections = [
       ...tagAll(tashahhudPhrases, 'Tashahhud'),
       ...tagAll(salamPhrases, 'Salam'),
     ] },
+
+  { key: 'special', title: 'Special Translations', tag: 'Phrase Study',
+    items: specialPhrases },
 ];
 
 // Unified flat list: { sectionIdx, tag, phrase, localIdx }
