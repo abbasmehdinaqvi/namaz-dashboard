@@ -128,6 +128,15 @@
 
   .section-header:first-child { border-top: none; margin-top: 0; }
 
+  .subsection-header {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(200,152,58,0.5);
+    padding: 10px 24px 4px 44px;
+  }
+
   .phrase-item {
     padding: 12px 24px;
     cursor: pointer;
@@ -414,6 +423,40 @@
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
   }
+
+  .hero-tag-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+
+  .hero-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(200,152,58,0.65);
+  }
+
+  .tag-chev {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(200,152,58,0.3);
+    background: transparent;
+    color: var(--gold2);
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0;
+  }
+
+  .tag-chev:hover { background: rgba(200,152,58,0.15); border-color: var(--gold); }
+  .tag-chev:disabled { opacity: 0.15; cursor: default; }
 
   .hero-arabic {
     font-family: 'Amiri', serif;
@@ -791,6 +834,10 @@
     .side-arrow { width: 36px; height: 36px; font-size: 16px; }
     .divider { gap: 10px; }
 
+    /* Group chevrons compact on phone */
+    .hero-tag-row { gap: 8px; }
+    .hero-tag { letter-spacing: 2px; }
+
     /* Bottom bar slide arrows get primary visual weight */
     #bottom-bar .nav-btn {
       background: rgba(200,152,58,0.15);
@@ -909,6 +956,11 @@
             <circle cx="40" cy="40" r="5" fill="#C8983A" opacity="0.7"/>
           </svg>
         </div>
+        <div class="hero-tag-row">
+          <button class="tag-chev" id="tag-prev" title="Previous group">&#8249;</button>
+          <div class="hero-tag" id="hero-tag"></div>
+          <button class="tag-chev" id="tag-next" title="Next group">&#8250;</button>
+        </div>
         <div class="hero-arabic" id="hero-arabic"></div>
         <div class="hero-translit" id="hero-translit"></div>
         <div class="hero-english" id="hero-english"></div>
@@ -943,10 +995,10 @@
     <div id="footer-bar">
       <span class="footer-note" id="footer-note"></span>
       <div class="tag-group">
-        <span class="tag">Twelver Shia</span>
+        <span class="tag">Azan &amp; Iqamah</span>
         <span class="tag">Arabic</span>
       </div>
-      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v4.2</span>
+      <span style="font-size:9px;color:rgba(138,155,181,0.4);flex-shrink:0;">v5.1</span>
     </div>
   </main>
 
@@ -1194,6 +1246,17 @@ const duaPhrases = [
       { ar: "وَ", tr: "wa", en: "and" },
       { ar: "رِزْقِي", tr: "rizqi", en: "my provision / sustenance" },
       { ar: "دَارًّا", tr: "darran", en: "abundant / flowing" },
+    ]
+  },
+  {
+    arabic: "وَأَوْلَادِي أَبْرَارًا",
+    translit: "Wa awladi abraran",
+    english: "And my children righteous.",
+    note: "Asking for offspring who are among the abrar.",
+    words: [
+      { ar: "وَ", tr: "wa", en: "and" },
+      { ar: "أَوْلَادِي", tr: "awladi", en: "my children" },
+      { ar: "أَبْرَارًا", tr: "abraran", en: "righteous / virtuous" },
     ]
   },
   {
@@ -1729,27 +1792,162 @@ const specialPhrases = [
   },
 ];
 
+const qadrPhrases = [
+  {
+    arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+    translit: "Bismillahir Rahmanir Rahim",
+    english: "In the name of Allah, the Most Compassionate, the Most Merciful.",
+    note: "The Basmala — opening of the Surah.",
+    words: [
+      { ar: "بِسْمِ", tr: "Bismi", en: "In the name" },
+      { ar: "اللَّهِ", tr: "Allah", en: "Allah" },
+      { ar: "الرَّحْمَٰنِ", tr: "ar-Rahman", en: "the Most Compassionate" },
+      { ar: "الرَّحِيمِ", tr: "ar-Rahim", en: "the Most Merciful" },
+    ]
+  },
+  {
+    arabic: "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ",
+    translit: "Inna anzalnahu fi laylatil qadr",
+    english: "Indeed, We sent it down on the Night of Qadr.",
+    note: "Verse 1 — the Quran descends on the Night of Destiny.",
+    words: [
+      { ar: "إِنَّا", tr: "inna", en: "indeed We" },
+      { ar: "أَنزَلْنَاهُ", tr: "anzalnahu", en: "We sent it down" },
+      { ar: "فِي", tr: "fi", en: "in / on" },
+      { ar: "لَيْلَةِ", tr: "laylati", en: "the Night" },
+      { ar: "الْقَدْرِ", tr: "al-qadr", en: "of Qadr / Destiny" },
+    ]
+  },
+  {
+    arabic: "وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ",
+    translit: "Wa ma adraka ma laylatul qadr",
+    english: "And what can make you know what the Night of Qadr is?",
+    note: "Verse 2 — its greatness is beyond estimation.",
+    words: [
+      { ar: "وَمَا", tr: "wa ma", en: "and what" },
+      { ar: "أَدْرَاكَ", tr: "adraka", en: "can make you know" },
+      { ar: "مَا", tr: "ma", en: "what is" },
+      { ar: "لَيْلَةُ", tr: "laylatu", en: "the Night" },
+      { ar: "الْقَدْرِ", tr: "al-qadr", en: "of Qadr" },
+    ]
+  },
+  {
+    arabic: "لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ",
+    translit: "Laylatul qadri khayrum min alfi shahr",
+    english: "The Night of Qadr is better than a thousand months.",
+    note: "Verse 3 — one night outweighing a lifetime.",
+    words: [
+      { ar: "لَيْلَةُ", tr: "laylatu", en: "the Night" },
+      { ar: "الْقَدْرِ", tr: "al-qadri", en: "of Qadr" },
+      { ar: "خَيْرٌ", tr: "khayrun", en: "is better" },
+      { ar: "مِّنْ", tr: "min", en: "than" },
+      { ar: "أَلْفِ", tr: "alfi", en: "a thousand" },
+      { ar: "شَهْرٍ", tr: "shahr", en: "months" },
+    ]
+  },
+  {
+    arabic: "تَنَزَّلُ الْمَلَائِكَةُ وَالرُّوحُ فِيهَا بِإِذْنِ رَبِّهِم مِّن كُلِّ أَمْرٍ",
+    translit: "Tanazzalul mala'ikatu war ruhu fiha bi idhni rabbihim min kulli amr",
+    english: "The angels and the Spirit descend in it, by their Lord's permission, with every matter.",
+    note: "Verse 4 — the descent of the angels and the Ruh.",
+    words: [
+      { ar: "تَنَزَّلُ", tr: "tanazzalu", en: "descend" },
+      { ar: "الْمَلَائِكَةُ", tr: "al-mala'ikatu", en: "the angels" },
+      { ar: "وَالرُّوحُ", tr: "war-ruhu", en: "and the Spirit" },
+      { ar: "فِيهَا", tr: "fiha", en: "in it" },
+      { ar: "بِإِذْنِ", tr: "bi idhni", en: "by permission" },
+      { ar: "رَبِّهِم", tr: "rabbihim", en: "of their Lord" },
+      { ar: "مِّن كُلِّ", tr: "min kulli", en: "with every" },
+      { ar: "أَمْرٍ", tr: "amr", en: "matter / decree" },
+    ]
+  },
+  {
+    arabic: "سَلَامٌ هِيَ حَتَّىٰ مَطْلَعِ الْفَجْرِ",
+    translit: "Salamun hiya hatta matla'il fajr",
+    english: "Peace it is, until the rising of the dawn.",
+    note: "Verse 5 — a night of pure peace until dawn.",
+    words: [
+      { ar: "سَلَامٌ", tr: "salamun", en: "peace" },
+      { ar: "هِيَ", tr: "hiya", en: "it is" },
+      { ar: "حَتَّىٰ", tr: "hatta", en: "until" },
+      { ar: "مَطْلَعِ", tr: "matla'i", en: "the rising" },
+      { ar: "الْفَجْرِ", tr: "al-fajr", en: "of the dawn" },
+    ]
+  },
+];
+
+const kausarPhrases = [
+  {
+    arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+    translit: "Bismillahir Rahmanir Rahim",
+    english: "In the name of Allah, the Most Compassionate, the Most Merciful.",
+    note: "The Basmala — opening of the Surah.",
+    words: [
+      { ar: "بِسْمِ", tr: "Bismi", en: "In the name" },
+      { ar: "اللَّهِ", tr: "Allah", en: "Allah" },
+      { ar: "الرَّحْمَٰنِ", tr: "ar-Rahman", en: "the Most Compassionate" },
+      { ar: "الرَّحِيمِ", tr: "ar-Rahim", en: "the Most Merciful" },
+    ]
+  },
+  {
+    arabic: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ",
+    translit: "Inna a'taynakal kausar",
+    english: "Indeed, We have granted you al-Kausar (abundance).",
+    note: "Verse 1 — the gift of abundance to the Prophet ﷺ.",
+    words: [
+      { ar: "إِنَّا", tr: "inna", en: "indeed We" },
+      { ar: "أَعْطَيْنَاكَ", tr: "a'taynaka", en: "We have granted you" },
+      { ar: "الْكَوْثَرَ", tr: "al-kausar", en: "abundance" },
+    ]
+  },
+  {
+    arabic: "فَصَلِّ لِرَبِّكَ وَانْحَرْ",
+    translit: "Fasalli li rabbika wanhar",
+    english: "So pray to your Lord and sacrifice.",
+    note: "Verse 2 — gratitude expressed in prayer and sacrifice.",
+    words: [
+      { ar: "فَصَلِّ", tr: "fasalli", en: "so pray" },
+      { ar: "لِرَبِّكَ", tr: "li rabbika", en: "to your Lord" },
+      { ar: "وَانْحَرْ", tr: "wanhar", en: "and sacrifice" },
+    ]
+  },
+  {
+    arabic: "إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ",
+    translit: "Inna shani'aka huwal abtar",
+    english: "Indeed, your enemy is the one cut off.",
+    note: "Verse 3 — the reversal: the taunter is the one left without.",
+    words: [
+      { ar: "إِنَّ", tr: "inna", en: "indeed" },
+      { ar: "شَانِئَكَ", tr: "shani'aka", en: "your enemy / hater" },
+      { ar: "هُوَ", tr: "huwa", en: "he is" },
+      { ar: "الْأَبْتَرُ", tr: "al-abtar", en: "the one cut off" },
+    ]
+  },
+];
+
 const sections = [
-  { key: 'azan', title: 'Azan & Iqamah', tag: 'Twelver Shia',
+  { key: 'azan', title: 'Azan & Iqamah', tag: 'Azan & Iqamah',
     items: phrases },
 
   { key: 'duas', title: 'Dua of Namaz', tag: 'Dua',
     items: [
-      ...tagAll(duaPhrases, 'Dua After Azan'),
+      ...tagAll(duaPhrases, 'Dua-e-Qalb-e-Barr'),
       ...tagAll(ibrahimPhrases, 'Quran 14:40–41'),
       ...tagAll(israPhrases, 'Quran 17:80'),
     ] },
 
   { key: 'surahs', title: 'Namaz Surah', tag: 'Quran',
     items: [
-      ...tagAll(hamdPhrases, 'Quran 1:1–7'),
-      ...tagAll(ikhlasPhrases, 'Quran 112:1–4'),
+      ...tagAll(hamdPhrases, 'Surah Al-Hamd · 1'),
+      ...tagAll(qadrPhrases, 'Surah Al-Qadr · 97'),
+      ...tagAll(kausarPhrases, 'Surah Al-Kausar · 108'),
+      ...tagAll(ikhlasPhrases, 'Surah Al-Ikhlas · 112'),
+      ...tagAll(tasbihPhrases, 'Tasbihat Arba\'a'),
     ] },
 
   { key: 'recitations', title: 'Namaz Recitations', tag: 'Recitation',
     items: [
       ...tagAll(namazPhrases, 'Ruku & Sujood'),
-      ...tagAll(tasbihPhrases, 'Tasbihat Arba\'a'),
     ] },
 
   { key: 'closing', title: 'Tashahhud & Salam', tag: 'Closing',
@@ -1758,7 +1956,7 @@ const sections = [
       ...tagAll(salamPhrases, 'Salam'),
     ] },
 
-  { key: 'special', title: 'Special Translations', tag: 'Phrase Study',
+  { key: 'special', title: 'Other Translations', tag: 'Phrase Study',
     items: specialPhrases },
 ];
 
@@ -1774,6 +1972,20 @@ const sectionStarts = [];
   sections.forEach(s => { sectionStarts.push(acc); acc += s.items.length; });
 }
 
+// Sub-group starts: contiguous runs of the same tag (e.g. each surah, each dua source)
+const subgroupStarts = [];
+allItems.forEach((it, i) => {
+  if (i === 0 || it.tag !== allItems[i - 1].tag) subgroupStarts.push(i);
+});
+
+function subgroupIndexOf(idx) {
+  let g = 0;
+  for (let i = 0; i < subgroupStarts.length; i++) {
+    if (subgroupStarts[i] <= idx) g = i; else break;
+  }
+  return g;
+}
+
 let current = 0;
 
 function buildSidebar() {
@@ -1786,7 +1998,18 @@ function buildSidebar() {
     header.textContent = s.title;
     list.appendChild(header);
 
+    const multiGroup = new Set(s.items.map(p => p.tag || s.tag)).size > 1;
+    let lastTag = null;
+
     s.items.forEach((p, i) => {
+      const tag = p.tag || s.tag;
+      if (multiGroup && tag !== lastTag) {
+        const sub = document.createElement('div');
+        sub.className = 'subsection-header';
+        sub.textContent = tag;
+        list.appendChild(sub);
+        lastTag = tag;
+      }
       list.appendChild(makeItem(p, globalIdx, i));
       globalIdx++;
     });
@@ -1821,6 +2044,17 @@ function selectPhrase(idx) {
   const p = allItems[idx].phrase;
 
   document.getElementById('hero-arabic').textContent = p.arabic;
+  document.getElementById('hero-tag').textContent = allItems[idx].tag;
+
+  // Sub-group chevrons (hidden in the Azan & Iqamah section)
+  const g = subgroupIndexOf(idx);
+  const inAzan = sections[allItems[idx].sectionIdx].key === 'azan';
+  const tp = document.getElementById('tag-prev');
+  const tn = document.getElementById('tag-next');
+  tp.style.visibility = inAzan ? 'hidden' : 'visible';
+  tn.style.visibility = inAzan ? 'hidden' : 'visible';
+  tp.disabled = g === 0;
+  tn.disabled = g === subgroupStarts.length - 1;
   document.getElementById('hero-translit').textContent = p.translit;
   document.getElementById('hero-english').textContent = p.english;
   document.getElementById('footer-note').textContent = p.note;
@@ -1940,6 +2174,16 @@ document.getElementById('btn-last-section').addEventListener('click', () => {
 document.getElementById('btn-next-section').addEventListener('click', () => {
   const si = allItems[current].sectionIdx;
   if (si < sections.length - 1) { swipeDir = 'left'; selectPhrase(sectionStarts[si + 1]); }
+});
+
+// Sub-group navigation (surah-to-surah, dua-to-dua)
+document.getElementById('tag-prev').addEventListener('click', () => {
+  const g = subgroupIndexOf(current);
+  if (g > 0) { swipeDir = 'right'; selectPhrase(subgroupStarts[g - 1]); }
+});
+document.getElementById('tag-next').addEventListener('click', () => {
+  const g = subgroupIndexOf(current);
+  if (g < subgroupStarts.length - 1) { swipeDir = 'left'; selectPhrase(subgroupStarts[g + 1]); }
 });
 
 // Close drawer
